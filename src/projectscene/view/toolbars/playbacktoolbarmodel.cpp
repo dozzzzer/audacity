@@ -87,7 +87,7 @@ void PlaybackToolBarModel::load()
         });
 
         uiConfiguration()->currentThemeChanged().onNotify(this, [this]() {
-            reload();
+            onThemeChanged();
         });
 
         context()->currentProjectChanged().onNotify(this, [this]() {
@@ -116,6 +116,26 @@ void PlaybackToolBarModel::load()
 void PlaybackToolBarModel::reload()
 {
     load();
+    updateStates();
+}
+
+void PlaybackToolBarModel::onThemeChanged()
+{
+    // Do not reload: recreating the items would re-read their enabled state
+    // from the actions register, which reports project actions as disabled
+    // while a dialog (e.g. Preferences) is open. Instead, refresh the
+    // theme-derived colors on the existing items.
+    const QColor iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
+    const QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
+
+    for (ToolBarItem* item : items()) {
+        auto controlItem = dynamic_cast<PlaybackToolBarControlItem*>(item);
+        if (controlItem) {
+            controlItem->setIconColor(iconColor);
+            controlItem->setBackgroundColor(backgroundColor);
+        }
+    }
+
     updateStates();
 }
 

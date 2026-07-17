@@ -65,6 +65,7 @@ signals:
 
 private:
     void reload();
+    void onThemeChanged();
     void setupProjectConnections(project::IAudacityProject& project);
 
     void onActionsStateChanges(const muse::actions::ActionCodeList& codes) override;

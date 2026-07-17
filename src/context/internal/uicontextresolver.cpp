@@ -141,6 +141,17 @@ bool UiContextResolver::match(const ui::UiContext& currentCtx, const ui::UiConte
         return true;
     }
 
+    //! NOTE While a dialog (e.g. Preferences, a generator or an effect) is open on top
+    //! of the project page, the context resolves to `UiCtxDialogOpened` (or `UiCtxUnknown`
+    //! for dialogs that are not on the interactive stack). Actions that only require an
+    //! open project (e.g. the playback toolbar ones) should stay enabled in that case,
+    //! as long as a project is actually open.
+    if ((currentCtx == context::UiCtxDialogOpened || currentCtx == context::UiCtxUnknown)
+        && actCtx == context::UiCtxProjectOpened
+        && globalContext()->currentProject()) {
+        return true;
+    }
+
     return currentCtx == actCtx;
 }
 
